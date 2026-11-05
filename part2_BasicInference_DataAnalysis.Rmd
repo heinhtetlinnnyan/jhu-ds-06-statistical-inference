@@ -1,0 +1,72 @@
+---
+title: "Basic Inferential Data Analysis"
+author: "Hein"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+# Basic Inferential Data Analysis
+
+We did a descriptive analysis. followed by confidence intervals and hypothesis testing.
+
+## Descriptive Summary
+```{r setup, include=TRUE}
+knitr::opts_chunk$set(echo = TRUE)
+library(summarytools)
+
+
+data("ToothGrowth")
+head(ToothGrowth)
+dim(ToothGrowth)
+dfSummary(ToothGrowth)
+```
+
+- len - Tooth Length - range from 4.2 to 33.9. mean 18.81 and median 19.25.
+- supp - Supplement - OJ - Orange Juice - 30 observations and VC - Vitamin C - 30 observations.
+- dose - Dose level - 3 doses - 0.5, 1, 2 mg/day for both OJ and VC.
+
+## Overall Supplement Compare
+
+```{r}
+t.test(len ~ supp, data = ToothGrowth)
+```
+
+Confidence Interval includes 0 [-0.171, 7.571] and p value greater than 0.05. There is no statistically significant difference in tooth growth between groups.
+
+## Supplement at each 3 doses.
+
+```{r}
+dose_0.5 <- subset(ToothGrowth, dose == 0.5)
+dose_1.0 <- subset(ToothGrowth, dose == 1.0)
+dose_2.0 <- subset(ToothGrowth, dose == 2.0)
+```
+
+For 0.5 mg/day
+
+```{r}
+t.test(len ~ supp, data = dose_0.5)
+```
+
+At 0.5mg/day, Orange Juice is more effective than Vitamin C.
+
+For 1 mg/day
+
+```{r}
+t.test(len ~ supp, data = dose_1.0)
+```
+
+
+At 1mg/day, Orange Juice is more effective than Vitamin C.
+
+
+For 2 mg/day
+
+```{r}
+t.test(len ~ supp, data = dose_2.0)
+```
+
+At 2mg/day, no siginificant difference seen.
+
+## Conclusions and Assumptions
+
+Orange Juice deliver tooth growth over vitamin C except in 2mg dose.
+

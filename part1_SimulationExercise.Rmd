@@ -1,0 +1,90 @@
+---
+title: "A simulation exercise"
+author: "Hein"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Overview
+
+We set lambda 0.2, We drew 40 random exponential values and calculated their mean and repeated the process 1000 times.
+
+- For 1, Sample Mean Vs Theoretical Mean - we compared the mean of 1000 simulated means against the theoretical mean.
+- For 2, Sample Variance vs Theoretical Variance - we calculated variance and standard deviation of our sample means and compared standard deviation against theoretical standard deviation on plot.
+- For 3, We evaluated if the distribution of sample means forms a bell curve.
+
+## 1.Show the sample mean and compare it to the theoretical mean of the distribution.
+```{r}
+library(ggplot2)
+lambda <- 0.2
+n <- 40
+sims <- 1000
+rexp(40,0.2)
+mean(rexp(40,0.2))
+
+set.seed(44)
+sim_means <- replicate(1000, mean(rexp(40, 0.2)))
+```
+
+```{r}
+sample_mean <- mean(sim_means)
+theo_mean <- 1 / 0.2
+sample_mean; theo_mean
+```
+The sample mean is `r round(sample_mean,2)`, - very similar to theoretical mean - `r round(theo_mean,2)`.
+```{r}
+mydata <- data.frame(sim_means)
+ggplot(mydata,
+       aes( x = sim_means)) +
+        geom_histogram(binwidth = 0.1, color = "black") +
+        geom_vline(aes(xintercept = sample_mean, linetype = "sample_mean")) +
+        geom_vline(aes(xintercept = theo_mean, linetype = "theo_mean")) +
+        labs(title = "Sample Mean vs Theoretical Mean",
+             x = "Samples Means of 40 Exponentials",
+             y = "Counts") +
+        theme_minimal()
+```
+
+
+We can see the solid line - sample mean and the dash line - theoretical mean are almost on the same line. So, we can see they are almost the same.
+
+## 2.Show how variable the sample is (via variance) and compare it to the theoretical variance of the distribution.
+```{r}
+sample_var <- var(sim_means)
+theo_var <- (1/lambda)^2/n
+sample_var;theo_var
+
+sample_sd <- sd(sim_means)
+theo_sd <- sqrt(theo_var)
+
+ggplot(mydata,
+       aes( x = sim_means)) +
+        geom_histogram(binwidth = 0.1, color = "black") +
+        geom_vline(aes(xintercept = sample_mean + sample_sd, linetype = "sample")) +
+        geom_vline(aes(xintercept = sample_mean - sample_sd, linetype = "sample")) +
+        geom_vline(aes(xintercept = sample_mean + theo_sd, linetype = "theoretical")) +
+        geom_vline(aes(xintercept = sample_mean - theo_sd, linetype = "theoretical")) +
+        labs(title = "Sample Mean vs Theoretical Mean",
+             x = "Samples Means of 40 Exponentials",
+             y = "Counts") +
+        theme_minimal()
+```
+The sample variance is `r (sample_var)`, - very similar to theoretical variance - `r (theo_var)`. On the graph, it shows + or - 1 sd from sample mean. Solid lines are for + or - sample standard deviation from sample mean while the dash lines for + or - theoretical standard deviation from sample mean. We can see these line overlap as they are the same.
+
+
+## 3.Show that the distribution is approximately normal.
+```{r}
+ggplot(mydata,
+       aes( x = sim_means)) +
+        geom_histogram(binwidth = 0.1, color = "black", aes(y = after_stat(density))) +
+        stat_function(fun = dnorm, args = list(mean = theo_mean, sd = theo_sd), color = "red", linewidth = 1.2) +
+        labs(title = "Density of Sample means with Normal Curve",
+             x = "Sample Means of 40 Exponentials",
+             y = "Density") +
+        theme_minimal()
+```
+In the graph, the red line - theoretical line show how the sample means form a bell curve.
